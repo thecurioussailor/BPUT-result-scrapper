@@ -1,4 +1,21 @@
 import axios from "axios";
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+
+async function insertUser(name: string, rollNo: string, batch: string, courseName: string, collegeName: string,sgpa:string){
+  const res = await prisma.user.create({
+      data:{
+          name,
+          rollNo,
+          batch,
+          courseName,
+          collegeName,
+          sgpa
+      }
+  })
+
+  console.log(res)
+}
 
 async function getSgpa(rollNo:string, semId:string, type: string){
     let config = {
@@ -90,10 +107,17 @@ async function fetchData(rollNo:string, semId:string, type: string) {
 
 async function main(){
 
-    for(let i = 2301204132; i < 2301205000;i++){
+    for(let i = 2301204183; i < 2301205000;i++){
         const data = await fetchData(i.toString(),"1","Odd");
         if(data){
-            console.log(data);
+            const studentName = data.userDetail.studentName;
+            const rollNo = data.userDetail.rollNo;
+            const batch = data.userDetail.batch;
+            const courseName = data.userDetail.courseName;
+            const collegeName = data.userDetail.collegeName;
+            const sgpa = data.sgpadata.sgpa;
+
+            insertUser(studentName,rollNo,batch,courseName,collegeName,sgpa)
         }
     }
 }
